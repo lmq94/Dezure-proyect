@@ -1,11 +1,14 @@
 import User from '../interface/User';
 import UserModel from "../model/UserModel";
+import ProductDTO from "../interface/ProductDTO";
+
 
 
 class UserService {
 
     constructor() {
     }
+
 
     async createUser(userData: User): Promise<UserModel> {
         try {
@@ -37,7 +40,6 @@ class UserService {
             }
             return await user.update(updatedUserData);
         } catch (error) {
-            console.error('Error al actualizar usuario:', error);
             throw new Error('Error al actualizar usuario');
         }
     }
@@ -50,8 +52,15 @@ class UserService {
             }
             await user.destroy();
         } catch (error) {
-            console.error('Error al eliminar usuario:', error);
             throw new Error('Error al eliminar usuario');
+        }
+    }
+
+    async getUserByEmail(email: string): Promise<User | null> {
+        try {
+            return await UserModel.findOne({where: {email}});
+        } catch (error) {
+            throw new Error('Error al obtener usuario por email');
         }
     }
 
