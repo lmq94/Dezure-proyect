@@ -1,0 +1,16 @@
+{
+  "development": {
+    "username": "root",
+    "password": "",
+    "database": "dezure",
+    "host": "localhost",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "your_username",
+    "password": "your_password",
+    "database": "your_database_name",
+    "host": "your_production_host",
+    "dialect": "mysql"
+  }
+}
