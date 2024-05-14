@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import UserService from '../service/UserService';
 import UserModel from "../model/UserModel";
+import AuthService from "../service/AuthService";
 
 class UserController {
     private userService: UserService;
+    private authService: AuthService;
 
-    constructor(userService: UserService) {
-        this.userService = new UserService();
+    constructor(userService: UserService, authService: AuthService) {
+        this.userService =  userService;
+        this.authService = authService;
     }
 
     async getUserById(req: Request, res: Response) {
@@ -61,6 +64,20 @@ class UserController {
             res.json({ message: 'Usuario eliminado correctamente' });
         } catch (error) {
             res.status(500).json({ error: error.message });
+        }
+    }
+
+
+    async login(req: Request, res: Response) {
+        try {
+            const { email, password } = req.body;
+
+            const result = await this.authService.login(email, password);
+
+            res.status(200).json(result);
+        } catch (error) {
+            console.error('Error al realizar el login:', error);
+            res.status(500).json({ message: 'Error al realizar el login' });
         }
     }
 
