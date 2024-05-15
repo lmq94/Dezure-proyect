@@ -1,38 +1,26 @@
 import User from '../interface/User';
-import UserModel from "../model/UserModel";
-import ProductDTO from "../interface/ProductDTO";
-
-
+import UserModel from '../model/UserModel';
 
 class UserService {
-
-    constructor() {
-    }
-
+    constructor() {}
 
     async createUser(userData: User): Promise<UserModel> {
         try {
-
-            let newUser: UserModel;
-
-            newUser = await UserModel.create(userData as any);
-            return newUser;
-        }  catch (error) {
-
+            return await UserModel.create(userData);
+        } catch (error) {
             throw new Error('Error al crear usuario: ' + error.message);
         }
     }
 
-    async findUserById(userId: number): Promise<UserModel> {
+    async findUserById(userId: number): Promise<UserModel | null> {
         try {
             return await UserModel.findByPk(userId);
         } catch (error) {
-
             throw new Error('Error al buscar usuario por ID: ' + error.message);
         }
     }
 
-    async updateUser(userId: number, updatedUserData: any): Promise<UserModel | null> {
+    async updateUser(userId: number, updatedUserData: Partial<User>): Promise<UserModel | null> {
         try {
             const user = await UserModel.findByPk(userId);
             if (!user) {
@@ -40,7 +28,7 @@ class UserService {
             }
             return await user.update(updatedUserData);
         } catch (error) {
-            throw new Error('Error al actualizar usuario');
+            throw new Error('Error al actualizar usuario: ' + error.message);
         }
     }
 
@@ -52,19 +40,18 @@ class UserService {
             }
             await user.destroy();
         } catch (error) {
-            throw new Error('Error al eliminar usuario');
+            throw new Error('Error al eliminar usuario: ' + error.message);
         }
     }
 
-    async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<UserModel | null> {
         try {
-            return await UserModel.findOne({where: {email}});
+            return await UserModel.findOne({ where: { email } });
         } catch (error) {
-            throw new Error('Error al obtener usuario por email');
+            throw new Error('Error al obtener usuario por email: ' + error.message);
         }
     }
-
-
 }
 
 export default UserService;
+

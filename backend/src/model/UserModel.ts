@@ -2,13 +2,13 @@ import {DataTypes, Model} from 'sequelize';
 import User from '../interface/User';
 import sequelize from "../../config/dataBase";
 
-class UserModel extends Model implements User {
-    public id!: number;
-    public username!: string;
-    public email!: string;
-    public password!: string;
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
+class UserModel extends Model<User> implements User {
+    id: number;
+    email: string;
+    password: string;
+    username: string;
+
+
 }
 
 UserModel.init(
