@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import {OpenAI} from "@langchain/openai"
-
+require('dotenv').config();
 
 class LangChainController{
 
@@ -18,7 +18,7 @@ class LangChainController{
             }
 
             let response: Promise<string> = this.openAi = new OpenAI({
-                openAIApiKey: "sk-proj-kLDadEqxw77UGbYZSDf6T3BlbkFJOLDU6NuMkk0H2Pm3ji8V",
+                openAIApiKey: process.env.OPENAI_API_KEY,
                 temperature: 0.9,
             }).invoke(text);
 
