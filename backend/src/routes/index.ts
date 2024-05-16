@@ -7,6 +7,7 @@ import ProductService from "../service/ProductService";
 import ProductController from "../controller/ProductController";
 import AuthService from "../service/AuthService";
 import verifyToken from "../middleware/auth";
+import LangChainController from "../controller/LangChainController";
 
 
 const router = Router();
@@ -15,6 +16,7 @@ const productService: ProductService = new ProductService();
 const authService = new AuthService(userService);
  let userController = new UserController(userService, authService);
  let productController = new ProductController(productService);
+ let langChainController = new LangChainController();
 
 
 
@@ -68,10 +70,8 @@ router.get('/users/:id', verifyToken, userController.getUserById.bind(userContro
  *         description: User created successfully
  *       400:
  *         description: Invalid input
- *       403:
- *         description: Authentication required
  */
-router.post('/users', verifyToken, userController.createUser.bind(userController));
+router.post('/users', userController.createUser.bind(userController));
 
 /**
  * @swagger
@@ -328,6 +328,29 @@ router.patch('/products/:id', verifyToken, productController.updateProduct.bind(
  *         description: Product not found
  */
 router.delete('/products/:id', verifyToken, productController.deleteProduct.bind(productController));
+
+/**
+ * @swagger
+ * /api/query-chatGPT:
+ *   get:
+ *     summary: Realizar una consulta a ChatGPT mediante LangChain
+ *     tags: [ChatGPT]
+ *     parameters:
+ *       - in: query
+ *         name: text
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Texto de la consulta a ChatGPT
+ *     responses:
+ *       200:
+ *         description: Respuesta exitosa
+ *       400:
+ *         description: Texto de la consulta requerido
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.get('/query-chatGPT', verifyToken, langChainController.handleQuery.bind(langChainController))
 
 export default router;
 
