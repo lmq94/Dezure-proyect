@@ -14,7 +14,7 @@ const verifyToken = (req: CustomRequest, res: Response, next: NextFunction): voi
         return;
     }
 
-    const token = authHeader.split(' ')[1];
+    const token:string = authHeader.split(' ')[1];
 
     const jwt = require('jsonwebtoken')
 
