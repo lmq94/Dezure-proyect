@@ -31,7 +31,7 @@ class ProductService{
     }
 
     async getFilteredProducts(page: number, pageSize: number, filterField: string, filterValue: string) {
-        const offset = (page - 1) * pageSize;
+        const offset: number = (page - 1) * pageSize;
         const where: any = {};
         if (filterField === 'name') {
             where[filterField] = { [Op.like]: `%${filterValue}%` };
@@ -44,14 +44,14 @@ class ProductService{
             offset,
         });
 
-        const productsDTO = products.map(product => this.productToDTO(product));
+        const productsDTO:ProductDTO[] = products.map(product => this.productToDTO(product));
         return { productsDTO, totalItems: count };
     }
 
 
     async updateProduct(id_product: number, updatedProductData: any): Promise<ProductModel | null> {
         try {
-            const product = await ProductModel.findByPk(id_product);
+            const product: ProductModel = await ProductModel.findByPk(id_product);
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
@@ -63,7 +63,7 @@ class ProductService{
 
     async deleteProduct(id_product: number): Promise<void> {
         try {
-            const product = await ProductModel.findByPk(id_product);
+            const product : ProductModel = await ProductModel.findByPk(id_product);
             if (!product) {
                 throw new Error('Producto no encontrado');
             }
