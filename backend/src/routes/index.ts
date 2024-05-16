@@ -8,6 +8,9 @@ import ProductController from "../controller/ProductController";
 import AuthService from "../service/AuthService";
 import verifyToken from "../middleware/auth";
 import LangChainController from "../controller/LangChainController";
+import {validate} from "../middleware/validator/Validator";
+import {createUserValidationRules, updateUserValidationRules} from "../middleware/validator/UserValidator";
+import {createProductValidationRules, updateProductValidationRules} from "../middleware/validator/ProductValidator";
 
 
 const router = Router();
@@ -24,24 +27,24 @@ const authService = new AuthService(userService);
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Get user by ID
- *     tags: [Users]
+ *     summary: Obtener usuario por ID
+ *     tags: [Usuarios]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: User ID
+ *         description: ID del usuario
  *     security:
  *       - bearerAuth: []  # Especifica que este endpoint requiere un token JWT
  *     responses:
  *       200:
- *         description: Successful response
+ *         description: Respuesta exitosa
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  *       404:
- *         description: User not found
+ *         description: Usuario no encontrado
  */
 router.get('/users/:id', verifyToken, userController.getUserById.bind(userController));
 
@@ -49,8 +52,8 @@ router.get('/users/:id', verifyToken, userController.getUserById.bind(userContro
  * @swagger
  * /api/users:
  *   post:
- *     summary: Create a new user
- *     tags: [Users]
+ *     summary: Crear un nuevo usuario
+ *     tags: [Usuarios]
  *     requestBody:
  *       required: true
  *       content:
@@ -60,32 +63,35 @@ router.get('/users/:id', verifyToken, userController.getUserById.bind(userContro
  *             properties:
  *               username:
  *                 type: string
+ *                 description: "El nombre de usuario debe tener al menos 1 carácter."
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: "Debe ser una dirección de correo electrónico válida."
  *               password:
  *                 type: string
+ *                 description: "La contraseña debe tener al menos 6 caracteres."
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: Usuario creado exitosamente
  *       400:
- *         description: Invalid input
+ *         description: Entrada inválida
  */
-router.post('/users', userController.createUser.bind(userController));
+router.post('/users', createUserValidationRules(), validate, userController.createUser.bind(userController));
 
 /**
  * @swagger
  * /api/users/{id}:
  *   patch:
- *     summary: Update user by ID
- *     tags: [Users]
+ *     summary: Actualizar usuario por ID
+ *     tags: [Usuarios]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
- *           type: string
+ *           type: integer
  *         required: true
- *         description: User ID
+ *         description: ID del usuario
  *     requestBody:
  *       required: true
  *       content:
@@ -95,43 +101,50 @@ router.post('/users', userController.createUser.bind(userController));
  *             properties:
  *               username:
  *                 type: string
+ *                 description: "El nombre de usuario debe tener al menos 1 carácter."
  *               email:
  *                 type: string
  *                 format: email
+ *                 description: "Debe ser una dirección de correo electrónico válida."
  *               password:
  *                 type: string
+ *                 description: "La contraseña debe tener al menos 6 caracteres."
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User updated successfully
+ *         description: Usuario actualizado exitosamente
  *       400:
- *         description: Invalid input
+ *         description: Entrada inválida
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  *       404:
- *         description: User not found
+ *         description: Usuario no encontrado
  */
-router.patch('/users/:id', verifyToken, userController.updateUser.bind(userController));
+router.patch('/users/:id', verifyToken, updateUserValidationRules(), validate, userController.updateUser.bind(userController));
 
 /**
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Delete user by ID
- *     tags: [Users]
+ *     summary: Eliminar usuario por ID
+ *     tags: [Usuarios]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: User ID
+ *         description: ID del usuario
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User deleted successfully
+ *         description: Usuario eliminado exitosamente
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  *       404:
- *         description: User not found
+ *         description: Usuario no encontrado
  */
 router.delete('/users/:id', verifyToken, userController.deleteUser.bind(userController));
 
@@ -139,8 +152,8 @@ router.delete('/users/:id', verifyToken, userController.deleteUser.bind(userCont
  * @swagger
  * /api/login:
  *   post:
- *     summary: User login
- *     tags: [Users]
+ *     summary: Inicio de sesión de usuario
+ *     tags: [Usuarios]
  *     requestBody:
  *       required: true
  *       content:
@@ -155,9 +168,9 @@ router.delete('/users/:id', verifyToken, userController.deleteUser.bind(userCont
  *                 type: string
  *     responses:
  *       200:
- *         description: Login successful
+ *         description: Inicio de sesión exitoso
  *       401:
- *         description: Invalid credentials
+ *         description: Credenciales inválidas
  */
 router.post('/login', userController.login.bind(userController));
 
@@ -165,8 +178,8 @@ router.post('/login', userController.login.bind(userController));
  * @swagger
  * /api/products:
  *   post:
- *     summary: Create a new product
- *     tags: [Products]
+ *     summary: Crear un nuevo producto
+ *     tags: [Productos]
  *     requestBody:
  *       required: true
  *       content:
@@ -176,43 +189,61 @@ router.post('/login', userController.login.bind(userController));
  *             properties:
  *               name:
  *                 type: string
+ *                 description: "El nombre del producto. Obligatorio y debe ser un texto."
+ *               description:
+ *                 type: string
+ *                 description: "La descripción del producto. Obligatoria y debe ser un texto."
  *               price:
  *                 type: number
+ *                 description: "El precio del producto. Obligatorio y debe ser un número mayor que 0."
+ *               stock_quantity:
+ *                 type: integer
+ *                 description: "La cantidad en stock del producto. Obligatoria y debe ser un entero mayor que 0."
+ *               category:
+ *                 type: string
+ *                 description: "La categoría del producto. Obligatoria y debe ser un texto."
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       201:
- *         description: Product created successfully
+ *         description: Producto creado exitosamente
  *       400:
- *         description: Invalid input
+ *         description: Entrada inválida
  *       403:
- *         description: Authentication required
- *
+ *         description: Autenticación requerida
+ */
+router.post('/products', verifyToken, createProductValidationRules(), validate, productController.createProduct.bind(productController));
+
+/**
+ * @swagger
+ * /api/products:
  *   get:
- *     summary: Get a list of products with optional filtering, pagination, and category filtering
- *     tags: [Products]
+ *     summary: Obtener una lista de productos con filtrado opcional, paginación y filtrado por categoría
+ *     tags: [Productos]
  *     parameters:
  *       - in: query
  *         name: page
  *         schema:
  *           type: integer
- *         description: Page number for pagination
+ *         description: Número de página para la paginación
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *         description: Number of products per page
+ *         description: Número de productos por página
  *       - in: query
  *         name: filterField
  *         schema:
  *           type: string
- *         description: Name of the filter field
+ *         description: Nombre del campo de filtro
  *       - in: query
  *         name: filterValue
  *         schema:
  *           type: string
- *         description: Value corresponding to the filter field
+ *         description: Valor correspondiente al campo de filtro
  *     responses:
  *       200:
- *         description: List of products
+ *         description: Lista de productos
  *         content:
  *           application/json:
  *             schema:
@@ -225,58 +256,25 @@ router.post('/login', userController.login.bind(userController));
  *                   filterValue:
  *                     type: string
  *       400:
- *         description: Invalid input
+ *         description: Entrada inválida
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  */
 router.get('/products', verifyToken, productController.getAllProducts.bind(productController));
 
 /**
  * @swagger
- * /api/products:
- *   post:
- *     summary: Create a new product
- *     tags: [Products]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               price:
- *                 type: number
- *               stock_quantity:
- *                 type: string
- *               category:
- *                 type: string
- *     responses:
- *       201:
- *         description: Product created successfully
- *       400:
- *         description: Invalid input
- *       403:
- *         description: Authentication required
- */
-router.post('/products', verifyToken, productController.createProduct.bind(productController));
-
-/**
- * @swagger
  * /api/products/{id}:
  *   patch:
- *     summary: Update product by ID
- *     tags: [Products]
+ *     summary: Actualizar producto por ID
+ *     tags: [Productos]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: Product ID
+ *         description: ID del producto
  *     requestBody:
  *       required: true
  *       content:
@@ -286,46 +284,55 @@ router.post('/products', verifyToken, productController.createProduct.bind(produ
  *             properties:
  *               name:
  *                 type: string
+ *                 description: "El nombre del producto. Obligatorio y debe ser un texto."
  *               description:
  *                 type: string
+ *                 description: "La descripción del producto. Obligatoria y debe ser un texto."
  *               price:
  *                 type: number
+ *                 description: "El precio del producto. Obligatorio y debe ser un número mayor que 0."
  *               stock_quantity:
- *                 type: string
+ *                 type: integer
+ *                 description: "La cantidad en stock del producto. Obligatoria y debe ser un entero mayor que 0."
  *               category:
  *                 type: string
+ *                 description: "La categoría del producto. Obligatoria y debe ser un texto."
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Product updated successfully
+ *         description: Producto actualizado exitosamente
  *       400:
- *         description: Invalid input
+ *         description: Entrada inválida
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  *       404:
- *         description: Product not found
+ *         description: Producto no encontrado
  */
-router.patch('/products/:id', verifyToken, productController.updateProduct.bind(productController));
+router.patch('/products/:id', verifyToken, updateProductValidationRules(), validate, productController.updateProduct.bind(productController));
 
 /**
  * @swagger
  * /api/products/{id}:
  *   delete:
- *     summary: Delete product by ID
- *     tags: [Products]
+ *     summary: Eliminar producto por ID
+ *     tags: [Productos]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: Product ID
+ *         description: ID del producto
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Product deleted successfully
+ *         description: Producto eliminado exitosamente
  *       403:
- *         description: Authentication required
+ *         description: Autenticación requerida
  *       404:
- *         description: Product not found
+ *         description: Producto no encontrado
  */
 router.delete('/products/:id', verifyToken, productController.deleteProduct.bind(productController));
 
@@ -350,7 +357,7 @@ router.delete('/products/:id', verifyToken, productController.deleteProduct.bind
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/query-chatGPT', verifyToken, langChainController.handleQuery.bind(langChainController))
+
+router.get("/api/query-chatGPT", verifyToken, langChainController.handleQuery.bind(langChainController))
 
 export default router;
-
