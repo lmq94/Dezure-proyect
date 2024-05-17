@@ -1,7 +1,7 @@
 
 import router from './routes/index';
 import { setupSwagger } from './swagger'
-import {body} from "express-validator";
+
 
 
  let express = require('express');
