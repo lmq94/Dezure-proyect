@@ -1,16 +1,16 @@
 {
   "development": {
-    "username": "root",
-    "password": "",
+    "username": "postgres",
+    "password": "root",
     "database": "dezure",
     "host": "localhost",
-    "dialect": "mysql"
+    "dialect": "postgres"
   },
   "production": {
     "username": "your_username",
     "password": "your_password",
     "database": "your_database_name",
     "host": "your_production_host",
-    "dialect": "mysql"
+    "dialect": ""
   }
 }

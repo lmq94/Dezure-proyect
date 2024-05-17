@@ -48,24 +48,31 @@ class ProductService{
         return { productsDTO, totalItems: count };
     }
 
+    async createProduct(data: { name: string, description: string, price: number, stock_quantity: number, category: string }): Promise<ProductDTO | null> {
 
-    async updateProduct(id_product: number, updatedProductData: any): Promise<ProductModel | null> {
+        return this.productToDTO(await ProductModel.create(data));
+    }
+
+
+    async updateProduct(id_product: number, updatedProductData: any): Promise<ProductDTO | null>{
         try {
             const product: ProductModel = await ProductModel.findByPk(id_product);
             if (!product) {
-                throw new Error('Producto no encontrado');
+               return null
             }
-            return await product.update(updatedProductData);
+           return  this.productToDTO(await product.update(updatedProductData));
+
+
         } catch (error) {
             throw new Error('Error al actualizar producto');
         }
     }
 
-    async deleteProduct(id_product: number): Promise<void> {
+    async deleteProduct(id_product: number): Promise<void| null> {
         try {
             const product : ProductModel = await ProductModel.findByPk(id_product);
             if (!product) {
-                throw new Error('Producto no encontrado');
+                return null
             }
             await product.destroy();
         } catch (error) {

@@ -57,7 +57,7 @@ class ProductController {
                 return res.status(400).json({ message: 'Todos los campos son obligatorios' });
             }
 
-            const newProduct: ProductModel = await ProductModel.create({ name, description, price, stock_quantity, category });
+            const newProduct: ProductDTO = await this.productService.createProduct({ name, description, price, stock_quantity, category });
 
             return res.status(201).json(newProduct);
 
@@ -71,7 +71,9 @@ class ProductController {
         const product_id: number = parseInt(req.params.id);
         const updatedProductData: Partial<ProductDTO> = req.body;
         try {
-            const updatedProduct: ProductModel = await this.productService.updateProduct(product_id, updatedProductData);
+            const updatedProduct: ProductDTO = await this.productService.updateProduct(product_id, updatedProductData);
+            if(!updatedProduct)
+                return res.status(404).json("Producto no encontrado")
             return res.json(updatedProduct);
         } catch (error) {
             return res.status(500).json({ error: error.message });
@@ -81,7 +83,12 @@ class ProductController {
     async deleteProduct(req: Request, res: Response): Promise<Response> {
         const product_id = parseInt(req.params.id);
         try {
-            await this.productService.deleteProduct(product_id);
+            const result = await this.productService.deleteProduct(product_id);
+
+            if (result === null) {
+                return res.status(404).json({ message: 'Producto no encontrado' });
+            }
+
             return res.json({ message: 'Producto eliminado correctamente' });
         } catch (error) {
             return res.status(500).json({ error: error.message });

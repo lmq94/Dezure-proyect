@@ -54,6 +54,7 @@ router.get('/users/:id', verifyToken, userController.getUserById.bind(userContro
  *   post:
  *     summary: Crear un nuevo usuario
  *     tags: [Usuarios]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -154,6 +155,7 @@ router.delete('/users/:id', verifyToken, userController.deleteUser.bind(userCont
  *   post:
  *     summary: Inicio de sesión de usuario
  *     tags: [Usuarios]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -218,7 +220,7 @@ router.post('/products', verifyToken, createProductValidationRules(), validate, 
  * @swagger
  * /api/products:
  *   get:
- *     summary: Obtener una lista de productos con filtrado opcional, paginación y filtrado por categoría
+ *     summary: Obtener una lista de productos con filtrado opcional, paginación (10 por pagina) y filtrado por categoría
  *     tags: [Productos]
  *     parameters:
  *       - in: query
@@ -226,11 +228,6 @@ router.post('/products', verifyToken, createProductValidationRules(), validate, 
  *         schema:
  *           type: integer
  *         description: Número de página para la paginación
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: Número de productos por página
  *       - in: query
  *         name: filterField
  *         schema:

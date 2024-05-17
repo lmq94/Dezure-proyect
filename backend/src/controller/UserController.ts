@@ -4,6 +4,7 @@ import UserModel from '../model/UserModel';
 import AuthService from '../service/AuthService';
 import User from "../interface/User";
 import CreateUserRequest from "../interface/CreateUserRequest";
+import UserDTO from "../interface/UserDto";
 
 
 class UserController {
@@ -18,7 +19,7 @@ class UserController {
     async getUserById(req: Request, res: Response): Promise<Response> {
         try {
             const userId: number = parseInt(req.params.id, 10);
-            const user: User | null = await this.userService.findUserById(userId);
+            const user: UserDTO | null = await this.userService.findUserById(userId);
 
             if (!user) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
@@ -35,11 +36,7 @@ class UserController {
         try {
             const { username, email, password }: CreateUserRequest = req.body;
 
-            if (!username || !email || !password) {
-                return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-            }
-
-            const newUser: User = await UserModel.create({ username, email, password });
+            const newUser: UserDTO = await this.userService.createUser({ username, email, password });
 
             return res.status(201).json(newUser);
         } catch (error) {
@@ -52,7 +49,7 @@ class UserController {
         const userId: number = parseInt(req.params.id, 10);
         const updatedUserData: Partial<User> = req.body;
         try {
-            const updatedUser: User | null = await this.userService.updateUser(userId, updatedUserData);
+            const updatedUser: UserDTO | null = await this.userService.updateUser(userId, updatedUserData);
             if (!updatedUser) {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
@@ -66,7 +63,9 @@ class UserController {
     async deleteUser(req: Request, res: Response): Promise<Response> {
         const userId: number = parseInt(req.params.id, 10);
         try {
-            await this.userService.deleteUser(userId);
+            const result = await this.userService.deleteUser(userId);
+            if(result == null)
+                return res.status(404).json({ message: 'Usuario no encontrado' });
             return res.json({ message: 'Usuario eliminado correctamente' });
         } catch (error) {
             console.error('Error al eliminar usuario:', error);
