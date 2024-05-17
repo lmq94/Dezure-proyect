@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, DataTypes) => {
     await queryInterface.createTable('product', {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
       },
       stock_quantity: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
       category: {

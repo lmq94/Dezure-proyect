@@ -14,7 +14,7 @@ class UserModel extends Model<User> implements User {
 UserModel.init(
     {
         id: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
