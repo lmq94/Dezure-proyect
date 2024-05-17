@@ -71,9 +71,7 @@ class ProductService{
     async deleteProduct(id_product: number): Promise<void| null> {
         try {
             const product : ProductModel = await ProductModel.findByPk(id_product);
-            if (!product) {
-                return null
-            }
+
             await product.destroy();
         } catch (error) {
             throw new Error('Error al eliminar producto');

@@ -64,12 +64,11 @@ class UserController {
         const userId: number = parseInt(req.params.id, 10);
         try {
             const result = await this.userService.deleteUser(userId);
-            if(result == null)
-                return res.status(404).json({ message: 'Usuario no encontrado' });
+
             return res.json({ message: 'Usuario eliminado correctamente' });
         } catch (error) {
             console.error('Error al eliminar usuario:', error);
-            return res.status(500).json({ message: 'Error al eliminar usuario' });
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
     }
 

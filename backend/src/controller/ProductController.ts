@@ -85,13 +85,9 @@ class ProductController {
         try {
             const result = await this.productService.deleteProduct(product_id);
 
-            if (result === null) {
-                return res.status(404).json({ message: 'Producto no encontrado' });
-            }
-
             return res.json({ message: 'Producto eliminado correctamente' });
         } catch (error) {
-            return res.status(500).json({ error: error.message });
+            return res.status(404).json("Producto no encontrado");
         }
     }
 }

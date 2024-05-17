@@ -50,9 +50,7 @@ class UserService {
     async deleteUser(userId: number): Promise<void> {
         try {
             const user = await UserModel.findByPk(userId);
-            if (!user) {
-                return null;
-            }
+
             await user.destroy();
         } catch (error) {
             throw new Error('Error al eliminar usuario: ' + error.message);
