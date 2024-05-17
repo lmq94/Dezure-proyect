@@ -81,7 +81,7 @@ class UserController {
             return res.status(200).json(result);
         } catch (error) {
             console.error('Error al realizar el login:', error);
-            return res.status(500).json({ message: 'Error al realizar el login' });
+            return res.status(401).json({ message: 'Contraseña o email incorrectos' });
         }
     }
 }

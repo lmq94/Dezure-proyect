@@ -53,10 +53,6 @@ class ProductController {
         try {
             const { name, description, price, stock_quantity, category } = req.body;
 
-            if (!name || !description || !price || !stock_quantity || !category) {
-                return res.status(400).json({ message: 'Todos los campos son obligatorios' });
-            }
-
             const newProduct: ProductDTO = await this.productService.createProduct({ name, description, price, stock_quantity, category });
 
             return res.status(201).json(newProduct);
